@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./input";
+import { apiKey } from "../apiKey";
 export default function Movies({ KeyWord, setKeyword }) {
-  const secondApiKey = "ed0ed00f";
   const values = useContext(MyContext);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(false);
@@ -26,13 +26,13 @@ export default function Movies({ KeyWord, setKeyword }) {
       try {
         setLoading(true);
         const response =
-          await fetch(`http://www.omdbapi.com/?s=${KeyWord}}&apikey=${secondApiKey}
+          await fetch(`http://www.omdbapi.com/?s=${KeyWord}}&apikey=${apiKey}
 `);
         if (!response.ok) {
           throw new Error("Bad Answer from Database!");
         }
         const data = await response.json();
-        // console.log(data);
+        console.log(apiKey);
         if (data.Response == "False") {
           values.setErrors([`No movie nor tv show was found!`]);
           values.setSwipe(false);
