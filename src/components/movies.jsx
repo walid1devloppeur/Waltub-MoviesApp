@@ -1,10 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./input";
-import { apiKey } from "../apiKey";
+import { apiKey, youtubApiKey } from "../apiKey";
+import Trailer from "./trailer";
 export default function Movies({ KeyWord, setKeyword }) {
   const values = useContext(MyContext);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(false);
+  const [youtubeUrl, setYoutubUrl] = useState("");
+  const [showtrailer, setShowTrailer] = useState(false);
   const [infos, setInfos] = useState([
     {
       Title: "",
@@ -13,9 +16,26 @@ export default function Movies({ KeyWord, setKeyword }) {
       Rating: "",
       Genre: "",
       Year: "",
-      RunTime: "",
     },
   ]);
+  const trailerHandler = async (title, year) => {
+    const query = `${title} ${year} trailer`;
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+        query
+      )}&type=video&key=${youtubApiKey}`
+    );
+    if (!response.ok) {
+      throw new Error("Bad Api Response !");
+    }
+    const data = await response.json();
+    if (data.items.length > 0) {
+      setYoutubUrl(`https://www.youtube.com/embed/${data.items[0].id.videoId}`);
+      console.log(youtubeUrl);
+      setToken(false);
+      setShowTrailer(true);
+    }
+  };
   const backButton = () => {
     values.setSwipe(false);
     setKeyword("");
@@ -82,15 +102,26 @@ export default function Movies({ KeyWord, setKeyword }) {
                     alt=""
                     className="w-[400px]  h-[500px] rounded-t-xl"
                   />
-                  <h1 className="text-center border-[1px] p-1 border-zinc-500 rounded-b-xl bg-[#7671a8] text-lg sm:text-2xl sm:p-2">
-                    {data.Title}
-                  </h1>
+                  <div className="text-center border-[1px] p-1 border-zinc-500 rounded-b-xl bg-[#7671a8] text-lg sm:text-xl sm:p-2">
+                    <div className="flex justify-between items-center">
+                      <h1 className="">
+                        {data.Title} ({data.Year})
+                      </h1>
+                      <button
+                        onClick={() => trailerHandler(data.Title, data.Year)}
+                        className="border-[2px] border-white p-1 sm:p-2 rounded-xl mx-2 hover:bg-[#252331] hover:text-white transition"
+                      >
+                        Preview
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       )}
+      {showtrailer && <Trailer urlForVideo={youtubeUrl} />}
     </>
   );
 }
