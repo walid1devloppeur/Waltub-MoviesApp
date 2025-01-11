@@ -31,7 +31,7 @@ export default function Movies({ KeyWord, setKeyword }) {
     const data = await response.json();
     if (data.items.length > 0) {
       setYoutubUrl(`https://www.youtube.com/embed/${data.items[0].id.videoId}`);
-      console.log(youtubeUrl);
+      // console.log(youtubeUrl);
       setToken(false);
       setShowTrailer(true);
     }
@@ -51,8 +51,9 @@ export default function Movies({ KeyWord, setKeyword }) {
         if (!response.ok) {
           throw new Error("Bad Answer from Database!");
         }
-        const data = await response.json();
-        console.log(apiKey);
+        const data = await response.json(); 
+        console.log(data)
+        // console.log(apiKey);
         if (data.Response == "False") {
           values.setErrors([`No movie nor tv show was found!`]);
           values.setSwipe(false);
